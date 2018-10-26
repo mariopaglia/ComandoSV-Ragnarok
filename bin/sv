@@ -1,0 +1,42 @@
+#!/bin/bash
+#======================//==========================
+#Atalho para execução de comandos em Shell
+#======================//==========================
+#Versão:
+#1.0 - Criado por Rhúlio Victor
+#2.0 - Adicionada novas funções por Carlos Lain
+#2.1 - Função para download de emuladores por Carlos Lain
+#2.2 - Correção na função instalar-cmake e remoção de alguns emuladores por Carlos Heitor Lain
+#2.3 - Atualização de Funções Alexandre Leigo
+#======================//==========================
+HOST_PATH=localhost
+USER_PATH=root
+SENHA_PATH=SENHA-DO-BANCO-DE-DADOS
+BD_PATH=BANCO-DE-DADOS-D0-SEU-RAGNAROK
+case $1 in
+    'ligar') cd /home/emulador2/ ; exec ./char-server & exec ./map-server & exec ./charserv & exec ./mapserv & ;;
+    'desligar') ps ax | grep -E "login-server|char-server|map-server" | awk '{print $1}' | xargs kill; echo "Servidor finalizado" ;;
+    'compilar') echo "Para compilar seu emulador você deverá utilizar o parâmetro que deseja.
+	Para a compilação por modo tradicional(GCC), ou seja, o modo mais conhecido, digite "sv compilar-autoconf" , sem aspas. 
+	Para a compilação por CMake digite "sv compilar-cmake" , sem aspas. 
+	Caso você não tenha o cmake 2.8.4 ou superior instalado em sua máquina, ou tenha alguma dúvida, contate nosso suporte." ;;
+    'retornar') screen -x ragnarok ;;
+    'compilar-cmake') cd /home/emulador2 ; cmake . ; make ; cd /home ;;
+    'compilar-autoconf') cd /home/emulador2 ; sh configure ; make clean ; make sql ; cd /home ;;
+    'backup') cd /home ; mkdir backup ; tar -czvf /home/backup/emulador_`date +%b%d-%Hh%Mm%Ss`.tgz emulador ; cd /home/backup ; mysqldump -h $HOST_PATH -u $USER_PATH -p$SENHA_PATH $BD_PATH > banco_`date +%b%d-%Hh%Mm%Ss`.sql.gz ;;
+	'baixar-emulador') echo "Para baixar os emuladores, utilize ./sv baixar-NOMEDOEMULADOR, os existentes são:
+	sv baixar-rathena
+	sv baixar-eathena
+	sv baixar-cronus
+	sv baixar-brathena
+
+" ;;
+    'baixar-rathena') cd /home ; mkdir backup ; tar -czvf /home/backup/emulador_`date +%b%d-%Hh%Mm%Ss`.tgz emulador ; cd /home/backup ; mysqldump -h $HOST_PATH -u $USER_PATH -p$SENHA_PATH $BD_PATH > banco_`date +%b%d-%Hh%Mm%Ss`.sql.gz ; cd /home ; rm -rf emulador ; mkdir emulador ; cd /emulador ; svn co https://github.com/rathena/rathena/trunk emulador ; unzip rathena.zip ; rm -rf rathena.zip ; echo "Seu emulador está localizado em /emulador e a cópia do emulador anterior está no diretório /beckup." ;;
+    'baixar-eathena') cd /home ; mkdir backup ; tar -czvf /home/backup/emulador_`date +%b%d-%Hh%Mm%Ss`.tgz emulador ; cd /home/backup ; mysqldump -h $HOST_PATH -u $USER_PATH -p$SENHA_PATH $BD_PATH > banco_`date +%b%d-%Hh%Mm%Ss`.sql.gz ; cd /home ; rm -rf emulador ; mkdir emulador ; cd /emulador ; svn co https://github.com/eathena/eathena/trunk emulador ; unzip eathena.zip ; rm -rf eathena.zip ; echo "Seu emulador está localizado em /emulador e a cópia do emulador anterior está no diretório /beckup." ;;
+    'baixar-cronus') cd /home ; mkdir backup ; tar -czvf /home/backup/emulador_`date +%b%d-%Hh%Mm%Ss`.tgz emulador ; cd /home/backup ; mysqldump -h $HOST_PATH -u $USER_PATH -p$SENHA_PATH $BD_PATH > banco_`date +%b%d-%Hh%Mm%Ss`.sql.gz ; cd /home ; rm -rf emulador ; mkdir emulador ; cd /emulador ; svn co https://github.com/Cronus-Emulator/Cronus/trunk emulador ; unzip cronus.zip ; rm -rf cronus.zip ; echo "Seu emulador está localizado em /emulador e a cópia do emulador anterior está no diretório /beckup." ;;
+    'baixar-brathena') cd /home ; mkdir backup ; tar -czvf /home/backup/emulador_`date +%b%d-%Hh%Mm%Ss`.tgz emulador ; cd /home/backup ; mysqldump -h $HOST_PATH -u $USER_PATH -p$SENHA_PATH $BD_PATH > banco_`date +%b%d-%Hh%Mm%Ss`.sql.gz ; cd /home ; rm -rf emulador ; mkdir emulador ; cd /emulador ; svn co https://github.com/brAthena/brAthena/trunk ; unzip brathena.zip ; rm -rf brathena.zip ; echo "Seu emulador está localizado em /emulador e a cópia do emulador anterior está no diretório /beckup." ;;
+    *) echo "Os parâmetros válidos são:
+ligar|desligar|backup|compilar|compilar-cmake|compilar-autoconf|baixar-emulador
+Para utilizar os comandos, digite no shell:
+./sv parâmetro" ;;
+esac

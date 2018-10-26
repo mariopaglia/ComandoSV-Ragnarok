@@ -8,10 +8,10 @@ O comando "SV" para Ragnarok foi criado em 2016 ou anteriormente por **Rhúlio V
 * **Sistemas Operacional:** Linux 
 * **Distribuições:** Testado e criado em CentOS 6.  
 
-[![GitHub issues](https://img.shields.io/github/issues/paghiper/whmcs.svg)](https://github.com/agenciah1code/ComandoSV-Ragnarok/issues)
-[![GitHub forks](https://img.shields.io/github/forks/paghiper/whmcs.svg)](https://github.com/agenciah1code/ComandoSV-Ragnarok/network)
-[![GitHub stars](https://img.shields.io/github/stars/paghiper/whmcs.svg)](https://github.com/agenciah1code/ComandoSV-Ragnarok/stargazers)
-[![GitHub license](https://img.shields.io/github/license/paghiper/whmcs.svg)](https://github.com/agenciah1code/ComandoSV-Ragnarok/blob/master/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/agenciah1code/ComandoSV-Ragnarok.svg)](https://github.com/agenciah1code/ComandoSV-Ragnarok/issues)
+[![GitHub forks](https://img.shields.io/github/forks/agenciah1code/ComandoSV-Ragnarok.svg)](https://github.com/agenciah1code/ComandoSV-Ragnarok/network)
+[![GitHub stars](https://img.shields.io/github/stars/agenciah1code/ComandoSV-Ragnarok.svg)](https://github.com/agenciah1code/ComandoSV-Ragnarok/stargazers)
+[![GitHub license](https://img.shields.io/github/license/agenciah1code/ComandoSV-Ragnarok.svg)](https://github.com/agenciah1code/ComandoSV-Ragnarok/blob/master/LICENSE)
 
 ## Funções Disponíveis
 

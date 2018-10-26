@@ -1,3 +1,5 @@
+### Versão em inglês / English version: [Clique aqui / Click here](https://github.com/agenciah1code/ComandoSV-Ragnarok/blob/master/README-EN.md)
+
 # História do Projeto
 
 O comando "SV" para Ragnarok foi criado em 2016 ou anteriormente por **Rhúlio Victor**, **Carlos Lain** e **Alexandre Leigo** em sua  [Versão 1.0](https://github.com/agenciah1code/ComandoSV-Ragnarok/tree/v1.0), em 2017 foi reformulado por **Mário Augusto Paglia** em sua [Versão 2.0](https://github.com/agenciah1code/ComandoSV-Ragnarok/tree/v2.0) e em Outubro/2018 retornado como Open Source.

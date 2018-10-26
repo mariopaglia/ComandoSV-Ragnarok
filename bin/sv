@@ -388,7 +388,7 @@ case $1 in
         ;;
         
         'preparar-rathena2')
-            cd /etc/yum.repos.d/ && wget https://pagliahost.com.br/comandos/mlampe.repo && yum -y install devtoolset-4-toolchain
+            cd /etc/yum.repos.d/ && wget https://copr.fedorainfracloud.org/coprs/mlampe/devtoolset-4.1/repo/epel-6/mlampe-devtoolset-4.1-epel-6.repo && yum -y install devtoolset-4-toolchain
         
             USUARIO=$(cat /usr/bin/usuario)
             

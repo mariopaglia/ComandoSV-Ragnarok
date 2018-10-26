@@ -1,42 +1,165 @@
 #!/bin/bash
-#======================//==========================
-#Atalho para execução de comandos em Shell
-#======================//==========================
-#Versão:
-#1.0 - Criado por Rhúlio Victor
-#2.0 - Adicionada novas funções por Carlos Lain
-#2.1 - Função para download de emuladores por Carlos Lain
-#2.2 - Correção na função instalar-cmake e remoção de alguns emuladores por Carlos Heitor Lain
-#2.3 - Atualização de Funções Alexandre Leigo
-#======================//==========================
-HOST_PATH=localhost
-USER_PATH=root
-SENHA_PATH=SENHA-DO-BANCO-DE-DADOS
-BD_PATH=BANCO-DE-DADOS-D0-SEU-RAGNAROK
-case $1 in
-    'ligar') cd /home/emulador2/ ; exec ./char-server & exec ./map-server & exec ./charserv & exec ./mapserv & ;;
-    'desligar') ps ax | grep -E "login-server|char-server|map-server" | awk '{print $1}' | xargs kill; echo "Servidor finalizado" ;;
-    'compilar') echo "Para compilar seu emulador você deverá utilizar o parâmetro que deseja.
-	Para a compilação por modo tradicional(GCC), ou seja, o modo mais conhecido, digite "sv compilar-autoconf" , sem aspas. 
-	Para a compilação por CMake digite "sv compilar-cmake" , sem aspas. 
-	Caso você não tenha o cmake 2.8.4 ou superior instalado em sua máquina, ou tenha alguma dúvida, contate nosso suporte." ;;
-    'retornar') screen -x ragnarok ;;
-    'compilar-cmake') cd /home/emulador2 ; cmake . ; make ; cd /home ;;
-    'compilar-autoconf') cd /home/emulador2 ; sh configure ; make clean ; make sql ; cd /home ;;
-    'backup') cd /home ; mkdir backup ; tar -czvf /home/backup/emulador_`date +%b%d-%Hh%Mm%Ss`.tgz emulador ; cd /home/backup ; mysqldump -h $HOST_PATH -u $USER_PATH -p$SENHA_PATH $BD_PATH > banco_`date +%b%d-%Hh%Mm%Ss`.sql.gz ;;
-	'baixar-emulador') echo "Para baixar os emuladores, utilize ./sv baixar-NOMEDOEMULADOR, os existentes são:
-	sv baixar-rathena
-	sv baixar-eathena
-	sv baixar-cronus
-	sv baixar-brathena
+# Desenvolvido por: Mário Augusto Paglia Júnior
+# Paglia Host Brasil: www.pagliahost.com.br
+#
+# Desenvolvido por: Rhúlio Victor
+# 
+# Desenvolvido por: Carlos Lain
+# 
+# Desenvolvido por: Alexandre Leigo
+# 
+# Script do comando SV, para ligar, desligar, compilar, baixar emuladores e diversas outras funções
+#
+# Versões:
+# 
+# 1.0 - 2016 ou anterior - Criação do script pelo Rhúlio Victor, Carlos Laion e Alexandre Leigo
+# 2.0 - 26/07/2017 - Reformulação completa do script realizado por Mário Augusto em 2017
+# 2.1 - 01/08/2017 - Correção e Adição de Novas Funções
+# 2.2 - 07/08/2017 - Adição do comando compilar-cmake para compilação via CMAKE
+# 2.3 - 25/08/2017 - Adição do comando SV Status, verificando se o servidor está online nos processos
+# 2.4 - 28/08/2017 - Adição dos comandos SV PREPARAR-RATHENA e SV COMPILAR-RATHENA especificos para preparação e compilação do emulador rAthena
+# 2.5 - 26/09/2017 - Adição do comando SV COMPILAR-RATHENA2 onde é instalado o compilador GCC 5.3 para os emuladores rAthena atuais
+# 2.6 - 30/09/2017 - Adição do comando SV COMPILAR-EAMOD, para compilar emuladores eAmod
+# 2.7 - 26/10/2017 - Melhoria e correção da listagem e descrição dos comandos através do comando principal "sv comandos"
+# 2.8 - 13/11/2017 - Melhoria do comando SV-STATUS, mostrando cores e a informação escrita se o emulador está ligado ou desligado
+# 2.9 - 07/02/2018 - Adição da função de verificar se o emulador está ligado para evitar ligar 2x o mesmo processo
+# 3.0 - 07/02/2018 - Adição da função de desligar forçadamente o emulador caso ele fique com processo preso, melhoria no visual do código
 
-" ;;
-    'baixar-rathena') cd /home ; mkdir backup ; tar -czvf /home/backup/emulador_`date +%b%d-%Hh%Mm%Ss`.tgz emulador ; cd /home/backup ; mysqldump -h $HOST_PATH -u $USER_PATH -p$SENHA_PATH $BD_PATH > banco_`date +%b%d-%Hh%Mm%Ss`.sql.gz ; cd /home ; rm -rf emulador ; mkdir emulador ; cd /emulador ; svn co https://github.com/rathena/rathena/trunk emulador ; unzip rathena.zip ; rm -rf rathena.zip ; echo "Seu emulador está localizado em /emulador e a cópia do emulador anterior está no diretório /beckup." ;;
-    'baixar-eathena') cd /home ; mkdir backup ; tar -czvf /home/backup/emulador_`date +%b%d-%Hh%Mm%Ss`.tgz emulador ; cd /home/backup ; mysqldump -h $HOST_PATH -u $USER_PATH -p$SENHA_PATH $BD_PATH > banco_`date +%b%d-%Hh%Mm%Ss`.sql.gz ; cd /home ; rm -rf emulador ; mkdir emulador ; cd /emulador ; svn co https://github.com/eathena/eathena/trunk emulador ; unzip eathena.zip ; rm -rf eathena.zip ; echo "Seu emulador está localizado em /emulador e a cópia do emulador anterior está no diretório /beckup." ;;
-    'baixar-cronus') cd /home ; mkdir backup ; tar -czvf /home/backup/emulador_`date +%b%d-%Hh%Mm%Ss`.tgz emulador ; cd /home/backup ; mysqldump -h $HOST_PATH -u $USER_PATH -p$SENHA_PATH $BD_PATH > banco_`date +%b%d-%Hh%Mm%Ss`.sql.gz ; cd /home ; rm -rf emulador ; mkdir emulador ; cd /emulador ; svn co https://github.com/Cronus-Emulator/Cronus/trunk emulador ; unzip cronus.zip ; rm -rf cronus.zip ; echo "Seu emulador está localizado em /emulador e a cópia do emulador anterior está no diretório /beckup." ;;
-    'baixar-brathena') cd /home ; mkdir backup ; tar -czvf /home/backup/emulador_`date +%b%d-%Hh%Mm%Ss`.tgz emulador ; cd /home/backup ; mysqldump -h $HOST_PATH -u $USER_PATH -p$SENHA_PATH $BD_PATH > banco_`date +%b%d-%Hh%Mm%Ss`.sql.gz ; cd /home ; rm -rf emulador ; mkdir emulador ; cd /emulador ; svn co https://github.com/brAthena/brAthena/trunk ; unzip brathena.zip ; rm -rf brathena.zip ; echo "Seu emulador está localizado em /emulador e a cópia do emulador anterior está no diretório /beckup." ;;
-    *) echo "Os parâmetros válidos são:
-ligar|desligar|backup|compilar|compilar-cmake|compilar-autoconf|baixar-emulador
-Para utilizar os comandos, digite no shell:
-./sv parâmetro" ;;
-esac
+emulador=/home/emulador
+banco=/var/lib/phpMyAdmin/upload/
+VERIFICA_PROCESSOS=$(ps aux | grep -E "map-server|login-server|char-server" | grep -v grep | wc -l)
+
+case $1 in
+        'ligar')                
+            if [ "$VERIFICA_PROCESSOS" -ge "1" ]
+            then
+                echo ""
+                echo "O SEU EMULADOR JÁ SE ENCONTRA LIGADO, POR FAVOR, USE O COMANDO 'SV DESLIGAR' ANTES DE LIGAR NOVAMENTE"
+                echo ""
+            else
+                cd $emulador; exec ./login-server & exec ./char-server & exec ./map-server & exec ./loginserv & exec ./charserv & exec ./mapserv & exec ./login-server_sql & exec ./char-server_sql & exec ./map-server_sql &
+            fi ;;   
+        'desligar') ps ax | grep -E "login-server|char-server|map-server" | awk '{print $1}' | xargs kill
+            sleep 1
+            echo ""
+            echo "AGUARDE 5 SEGUNDOS..."
+            sleep 1
+            echo "AGUARDE 4 SEGUNDOS..."
+            sleep 1
+            echo "AGUARDE 3 SEGUNDOS..."
+            sleep 1
+            echo "AGUARDE 2 SEGUNDOS..."
+            sleep 1
+            echo "AGUARDE 1 SEGUNDO..."
+            sleep 1
+
+            VERIFICA_PROCESSOS2=$(ps aux | grep -E "map-server|login-server|char-server" | grep -v grep | wc -l)
+            
+            if [ "$VERIFICA_PROCESSOS2" -eq "0" ]
+            then
+                echo ""
+            else
+                ps ax | grep -E "login-server|char-server|map-server" | awk '{print $1}' | xargs kill -9
+            fi
+                echo ""
+                echo "O SEU EMULADOR FOI DESLIGADO COM SUCESSO!"
+                echo "";;   
+
+        'compilar' | 'compilar-autoconf') cd /home/emulador; make clean; make sql ;;
+    
+        'compilar-cmake') cd /home/emulador ; cmake . ; make ;;
+      
+        'screen') screen -S ragnarok ;;
+        
+        'retornar') screen -r ragnarok ;;
+        
+        'status') ps aux | grep -E "map-server|login-server|char-server" | grep -v grep
+        
+                STATUS=$(ps aux | grep -E "map-server|login-server|char-server" | grep -v grep | wc -l)
+                
+            if [ "$STATUS" = "3" ]
+            then
+                echo ""
+                echo -e "O SEU EMULADOR ESTÁ \e[00;32mLIGADO\e[00m NO MOMENTO!"
+                echo ""
+            elif [ "$STATUS" = "2" ] || [ "$STATUS" = "1" ]
+            then
+                echo ""
+                echo -e "O SEU EMULADOR ESTÁ \e[00;32mLIGADO\e[00m NO MOMENTO, PORÉM COM UM DOS PROCESSOS DESLIGADOS, NECESSÁRIO SUA ATENÇÃO!"
+                echo ""
+            else
+                echo ""
+                echo -e "O SEU EMULADOR ESTÁ \e[00;31mDESLIGADO\e[00m NO MOMENTO!"
+                echo ""
+            fi  ;;
+        
+        'preparar') cd $emulador; chmod 777 configure; ./configure; echo "As permissões foram preparadas com sucesso!" ;;
+        
+        'preparar-rathena')
+            wget http://people.centos.org/tru/devtools-2/devtools-2.repo -O /etc/yum.repos.d/devtools-2.repo && yum -y install devtoolset-2-gcc devtoolset-2-binutils devtoolset-2-gcc-c++ devtoolset-2-gcc-gfortran
+            
+            source scl_source enable devtoolset-2
+            
+            if [ $? = 0 ]
+            then
+                source /opt/rh/devtoolset-2/enable
+                sv preparar-rathena2
+            else
+                echo ""
+                echo "COMANDO DE PREPARAÇÃO NÃO CONSEGUIU SER CONCLUÍDO COM SUCESSO!"
+                echo ""
+            fi  
+        ;;
+        
+        'preparar-rathena2') cd /etc/yum.repos.d/ && wget https://pagliahost.com.br/comandos/mlampe.repo && yum -y install devtoolset-4-toolchain
+        
+            USUARIO=$(cat /usr/bin/usuario)
+            
+            echo "source scl_source enable devtoolset-4" >> /home/$USUARIO/.bashrc
+            chown -R $USUARIO /var/lib/phpMyAdmin/upload/
+            
+            echo ""
+            echo "A SUA VPS ESTÁ PREPARADA COM SUCESSO PARA RECEBER O RATHENA!"
+            echo ""
+            ;;
+        
+        'compilar-rathena') cd /home/emulador; ./configure --disable-64bit; make clean; make server ;;
+        
+        'compilar-rathena2') cd /home/emulador; ./configure; make clean; make server ;;
+        
+        'compilar-eamod') cd /home/emulador; make clean; make sql; make sql ;;
+       
+        'backup') cd /home; rar a backup_`date +%d_%m_%y_%H_%M`.rar emulador; mkdir backup; mv backup_`date +%d_%m_%y_%H_%M`.rar /home/backup ;;
+        
+        'antigo') cd /home; rar a emulador_antigo_`date +%d_%m_%y`.rar emulador; mkdir backup; mv emulador_antigo_`date +%d_%m_%y`.rar /home/backup ;;
+        
+        'baixar-emulador') echo "Para baixar um emulador, use um dos seguintes comandos: sv baixar-cronus | sv baixar-brathena | sv baixar-hercules | sv baixar-rathena";;
+        
+        'baixar-cronus') cd /home; sv antigo; rm -rf emulador; mkdir emulador; svn co https://github.com/Cronus-Emulator/Cronus/trunk emulador; echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"; rm -rf $banco*; cd /home/emulador/sql-files; cp main.sql logs.sql $banco; cd /home/emulador/sql-files/item; cp item_db.sql item_db2.sql item_db_re.sql $banco; cd /home/emulador/sql-files/mob; cp mob_db.sql mob_db2.sql mob_db_re.sql mob_skill_db.sql mob_skill_db2.sql mob_skill_db_re.sql $banco; sv preparar ;;
+        
+        'baixar-brathena') cd /home; sv antigo; rm -rf emulador; mkdir emulador; svn co https://github.com/brAthena/brAthena/trunk emulador; echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"; rm -rf $banco*; cd /home/emulador/sql/; cp principal.sql logs.sql $banco; cd /home/emulador/sql/pre-renovacao/; cp pre-renovacao.sql $banco; cd /home/emulador/sql/renovacao/; cp renovacao.sql $banco; sv preparar ;;
+        
+        'baixar-hercules') cd /home; sv antigo; rm -rf emulador; svn co https://github.com/HerculesWS/Hercules/trunk emulador; echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"; rm -rf $banco*; cd /home/emulador/sql-files; cp item_db2.sql  item_db_re.sql  item_db.sql  logs.sql  main.sql  mob_db2.sql  mob_db_re.sql  mob_db.sql  mob_skill_db2.sql  mob_skill_db_re.sql  mob_skill_db.sql $banco; sv preparar ;;
+        
+        'baixar-rathena') cd /home; sv antigo; rm -rf emulador; mkdir emulador; svn co https://github.com/rathena/rathena/trunk emulador; echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"; rm -rf $banco*; cd /home/emulador/sql-files; cp item_cash_db.sql item_cash_db2.sql item_db.sql item_db2.sql item_db2_re.sql item_db_re.sql logs.sql main.sql mob_db.sql mob_db2.sql mob_db2_re.sql mob_db_re.sql mob_skill_db.sql mob_skill_db2.sql mob_skill_db2_re.sql mob_skill_db_re.sql roulette_default_data.sql $banco ;;
+        
+        *) echo "Os comandos válidos são:
+        
+sv ligar - Liga o emulador (brAthena/Cronus/Hércules/rAthena/eAmods)
+sv desligar - Desliga o emulador (brAthena/Cronus/Hércules/rAthena/eAmods)
+sv compilar - Compila o emulador (brAthena/Cronus/Hércules)
+sv status - Verifica se o emulador está com seus processos ligados ou desligados
+sv compilar-cmake - Compilar emualdor com CMAKE (emuladores específicos)
+sv screen - Roda o emulador em segundo plano com o Screen
+sv retornar - Retorna à tela do Screen nos demais acessos ao SSH
+sv preparar - Da as permissões inicias ao emulador (chmod 777 configure e ./configure)
+sv backup - Cria um backup e um arquivo .rar da pasta /home/emulador
+sv baixar-emulador - Baixar emuladores diretamente dos repositórios oficiais do GitHub (brAthena/Cronus/Hércules/rAthena)
+sv compilar-rathena - Comando especialmente criado para compilar emuladores rAthena (GCC-C++ versão 5.X)
+sv compilar-eamod - Comando especialmente criado para compilar emuladores eAmod
+
+Para utilizar os comandos, basta digitar em qualquer tela do seu SSH.
+
+Lembre-se de que seu emulador precisa ser instalado dentro de /home/emulador para o correto funcionamento dos comandos.
+"
+esac 

@@ -13,7 +13,7 @@
 # Versões:
 # 
 # 1.0 - 2016 ou anterior - Criação do script pelo Rhúlio Victor, Carlos Lain e Alexandre Leigo
-# 2.0 - 26/07/2017 - Criação do Script
+# 2.0 - 26/07/2017 - Reformulação completa do script realizado por Mário Augusto em 2017
 # 2.1 - 01/08/2017 - Correção e Adição de Novas Funções
 # 2.2 - 07/08/2017 - Adição do comando compilar-cmake para compilação via CMAKE
 # 2.3 - 25/08/2017 - Adição do comando SV Status, verificando se o servidor está online nos processos

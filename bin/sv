@@ -1,14 +1,7 @@
-#!/bin/bash
-# Desenvolvido por: Mário Augusto Paglia Júnior
-# Paglia Host Brasil: www.pagliahost.com.br
-#
-# Desenvolvido por: Rhúlio Victor
+#!/usr/bin/env bash
+# Autor: Mário Augusto Paglia Júnior < https://pagliahost.com.br >
 # 
-# Desenvolvido por: Carlos Lain
-# 
-# Desenvolvido por: Alexandre Leigo
-# 
-# Script do comando SV, para ligar, desligar, compilar, baixar emuladores e diversas outras funções
+# Descrição: Comando "SV" para Ragnarok é um comando para ligar, desligar, compilar, baixar emuladores, realizar edições e muito mais!
 #
 # Versões:
 # 
@@ -30,19 +23,24 @@
 # 3.4 - 10/04/2018 - Arrumado o BUG no comando "sv ligar" que fazia com que o MYSQL não reconhecesse as tabelas, retirado os fechamentos de saídas de erros
 # 3.5 - 31/07/2018 - Adicionado função para importar automaticamente banco de dados de acordo com o emulador baixado no "sv baixar-emulador"
 # 3.6 - 24/10/2018 - Adicionado função para instalar brAthena Old
+# 3.7 - 29/10/2018 - Otimização e melhorias no código para melhor portabilidade, adição do comando "SV EDITAR" e implementação da primeira função de troca de IP
 
-# Variáveis de Ambiente
+# Variáveis de Ambiente - Modificáveis
 
-emulador=/home/emulador             # Coloque aqui o diretório raiz do seu emulador
-banco=/var/lib/phpMyAdmin/upload/   # Coloque aqui o diretório de upload do seu phpMyAdmin
+EMULADOR=/home/emulador             # Coloque aqui o diretório raiz do seu emulador
+BANCO=/var/lib/phpMyAdmin/upload/   # Coloque aqui o diretório de upload do seu phpMyAdmin
+
+# ATENÇÃO: À PARTIR DAQUI, NÃO MEXA EM NADA, À NÃO SER QUE SAIBA O QUE ESTEJA FAZENDO!
+
+VERIFICA_PROCESSOS=$(ps aux | grep -E "map-server|login-server|char-server" | grep -v grep | wc -l)
 export COMANDO=$1
 
-function importarDB () {
+importarDB() {
 
 echo
-read -p "Deseja realizar a importação do banco de dados de forma automática? (S/s/N/n): " IMPORTAR
+read -p "Deseja realizar a importação do banco de dados de forma automática? (S/N): " IMPORTAR
 
-if [ $IMPORTAR = "N" ] || [ $IMPORTAR = "n" ] || [ $IMPORTAR = "não" ] || [ $IMPORTAR = "nao" ] || [ $IMPORTAR = "NÃO" ] || [ $IMPORTAR = "NAO" ]
+if [ $IMPORTAR = "n" ] || [ $IMPORTAR = "N" ]
 then
     exit 1
 else
@@ -264,45 +262,44 @@ then
 
     else
         echo
-        echo "Número não reconhecido. Digite 1 ou 2, tente novamente!"
-
+        echo "Número não reconhecido. Digite 1 ou 2, tente novamente, use o comando '"$0" importar-db'"
+        echo
     fi
 
 else
     echo
-    echo "Usuário ou Senha informados não existem, tente novamente"
+    echo "Usuário ou Senha informados não existem, tente novamente, use o comando '"$0" importar-db'"
+    echo
 
 fi # VERIFICA SE A CONEXÃO DO BANCO DE DADOS É REALIZADA
 
 }
 
 
-VERIFICA_PROCESSOS=$(ps aux | grep -E "map-server|login-server|char-server" | grep -v grep | wc -l)
-
 case $1 in
 
         'ligar')
 
-            if [[ -d $emulador ]]; then
+            if [[ -d $EMULADOR ]]; then
 
             if [[ "$VERIFICA_PROCESSOS" -ge "1" ]]; then
-                echo ""
-                echo "PRIMEIRAMENTE DESLIGUE O SEU EMULADOR COM 'SV DESLIGAR' ANTES DE LIGAR NOVAMENTE"
-                echo ""
+                echo
+                echo "PRIMEIRAMENTE DESLIGUE O SEU EMULADOR COM '"$0" desligar' ANTES DE LIGAR NOVAMENTE"
+                echo
             else
 
-            if [[ -x $emulador/login-server || -x $emulador/char-server || -x $emulador/map-server || -x $emulador/loginserv || -x $emulador/charserv || -x $emulador/mapserv || -x $emulador/login-server_sql || -x $emulador/char-server_sql || -x $emulador/map-server_sql ]]; then
+            if [[ -x $EMULADOR/login-server || -x $EMULADOR/char-server || -x $EMULADOR/map-server || -x $EMULADOR/loginserv || -x $EMULADOR/charserv || -x $EMULADOR/mapserv || -x $EMULADOR/login-server_sql || -x $EMULADOR/char-server_sql || -x $EMULADOR/map-server_sql ]]; then
 
-                cd $emulador; exec ./login-server & exec ./char-server & exec ./map-server & exec ./loginserv & exec ./charserv & exec ./mapserv & exec ./login-server_sql & exec ./char-server_sql & exec ./map-server_sql &
+                cd $EMULADOR; exec ./login-server & exec ./char-server & exec ./map-server & exec ./loginserv & exec ./charserv & exec ./mapserv & exec ./login-server_sql & exec ./char-server_sql & exec ./map-server_sql &
             else
                 echo
-                echo "OS ARQUIVOS DO SEU EMULADOR DENTRO DE $emulador NÃO EXISTEM OU NECESSITAM DE PERMISSÕES, USE 'SV PREPARAR' E DEPOIS COMPILE SEU EMULADOR"
+                echo "OS ARQUIVOS DO SEU EMULADOR DENTRO DE $EMULADOR NÃO EXISTEM OU NECESSITAM DE PERMISSÕES, USE '"$0" preparar' E DEPOIS COMPILE SEU EMULADOR"
                 echo
             fi
             fi
             else
                 echo
-                echo "O DIRETÓRIO $emulador AINDA NÃO EXISTE"
+                echo "O DIRETÓRIO $EMULADOR AINDA NÃO EXISTE"
                 echo                
             fi
         ;;
@@ -310,7 +307,7 @@ case $1 in
         'desligar')
             ps ax | grep -E "login-server|char-server|map-server" | awk '{print $1}' | xargs kill
             sleep 1
-            echo ""
+            echo
             echo "AGUARDE 2 SEGUNDOS..."
             sleep 1
             echo "AGUARDE 1 SEGUNDO..."
@@ -320,13 +317,13 @@ case $1 in
             
             if [ "$VERIFICA_PROCESSOS2" -eq "0" ]
             then
-                echo ""
+                echo
             else
                 ps ax | grep -E "login-server|char-server|map-server" | awk '{print $1}' | xargs kill -9
             fi
-                echo ""
+                echo
                 echo "O SEU EMULADOR FOI DESLIGADO COM SUCESSO!"
-                echo ""
+                echo
         ;;  
 
         'compilar' | 'compilar-autoconf')
@@ -352,23 +349,23 @@ case $1 in
                 
             if [ "$STATUS" = "3" ]
             then
-                echo ""
+                echo
                 echo -e "O SEU EMULADOR ESTÁ \e[00;32mLIGADO\e[00m NO MOMENTO!"
-                echo ""
+                echo
             elif [ "$STATUS" = "2" ] || [ "$STATUS" = "1" ]
             then
-                echo ""
+                echo
                 echo -e "O SEU EMULADOR ESTÁ \e[00;32mLIGADO\e[00m NO MOMENTO, PORÉM COM UM DOS PROCESSOS DESLIGADOS, NECESSÁRIO SUA ATENÇÃO!"
-                echo ""
+                echo
             else
-                echo ""
+                echo
                 echo -e "O SEU EMULADOR ESTÁ \e[00;31mDESLIGADO\e[00m NO MOMENTO!"
-                echo ""
+                echo
             fi
         ;;
         
         'preparar')
-            cd $emulador; chmod 777 configure; ./configure; echo "As permissões foram preparadas com sucesso!"
+            cd $EMULADOR; chmod 777 configure; ./configure; echo "As permissões foram preparadas com sucesso!"
         ;;
         
         'preparar-rathena')
@@ -381,9 +378,9 @@ case $1 in
                 source /opt/rh/devtoolset-2/enable
                 sv preparar-rathena2
             else
-                echo ""
+                echo
                 echo "COMANDO DE PREPARAÇÃO NÃO CONSEGUIU SER CONCLUÍDO COM SUCESSO!"
-                echo ""
+                echo
             fi  
         ;;
         
@@ -395,9 +392,9 @@ case $1 in
             echo "source scl_source enable devtoolset-4" >> /home/$USUARIO/.bashrc
             chown -R $USUARIO /var/lib/phpMyAdmin/upload/
             
-            echo ""
+            echo
             echo "A SUA VPS ESTÁ PREPARADA COM SUCESSO PARA RECEBER O RATHENA!"
-            echo ""
+            echo
         ;;
         
         'compilar-rathena')
@@ -425,30 +422,194 @@ case $1 in
         ;;
         
         'baixar-cronus')
-            cd /home; sv antigo; rm -rf emulador; mkdir emulador; svn co https://github.com/Cronus-Emulator/Cronus/trunk emulador; echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"; rm -rf $banco*; cd /home/emulador/sql-files; cp main.sql logs.sql $banco; cd /home/emulador/sql-files/item; cp item_db.sql item_db2.sql item_db_re.sql $banco; cd /home/emulador/sql-files/mob; cp mob_db.sql mob_db2.sql mob_db_re.sql mob_skill_db.sql mob_skill_db2.sql mob_skill_db_re.sql $banco; sv preparar
+            cd /home; sv antigo; rm -rf emulador; mkdir emulador; svn co https://github.com/Cronus-Emulator/Cronus/trunk emulador; echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"; rm -rf $BANCO*; cd /home/emulador/sql-files; cp main.sql logs.sql $BANCO; cd /home/emulador/sql-files/item; cp item_db.sql item_db2.sql item_db_re.sql $BANCO; cd /home/emulador/sql-files/mob; cp mob_db.sql mob_db2.sql mob_db_re.sql mob_skill_db.sql mob_skill_db2.sql mob_skill_db_re.sql $BANCO; sv preparar
             importarDB
         ;;
         
         'baixar-brathena')
-            cd /home; sv antigo; rm -rf emulador; mkdir emulador; svn co https://github.com/brAthena/brAthena/trunk emulador; echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"; rm -rf $banco*; cd /home/emulador/sql-files/; cp *.sql $banco; sv preparar
+            cd /home; sv antigo; rm -rf emulador; mkdir emulador; svn co https://github.com/brAthena/brAthena/trunk emulador; echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"; rm -rf $BANCO*; cd /home/emulador/sql-files/; cp *.sql $BANCO; sv preparar
             importarDB
         ;;
 
         'baixar-brathena-old')
-            cd /home; sv antigo; rm -rf emulador; mkdir emulador; svn co https://github.com/brAthena/brAthena20180924/trunk emulador; echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"; rm -rf $banco*; cd /home/emulador/sql-files/; cp *.sql $banco; sv preparar
+            cd /home; sv antigo; rm -rf emulador; mkdir emulador; svn co https://github.com/brAthena/brAthena20180924/trunk emulador; echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"; rm -rf $BANCO*; cd /home/emulador/sql-files/; cp *.sql $BANCO; sv preparar
             importarDB
         ;;
         
         'baixar-hercules')
-            cd /home; sv antigo; rm -rf emulador; svn co https://github.com/HerculesWS/Hercules/trunk emulador; echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"; rm -rf $banco*; cd /home/emulador/sql; cp *.sql $banco; cd /home/emulador/sql/pre-renovacao; cp *.sql $banco; cd /home/emulador/sql/renovacao; cp *.sql $banco; sv preparar
+            cd /home; sv antigo; rm -rf emulador; svn co https://github.com/HerculesWS/Hercules/trunk emulador; echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"; rm -rf $BANCO*; cd /home/emulador/sql; cp *.sql $BANCO; cd /home/emulador/sql/pre-renovacao; cp *.sql $BANCO; cd /home/emulador/sql/renovacao; cp *.sql $BANCO; sv preparar
             importarDB
         ;;
         
         'baixar-rathena')
-            cd /home; sv antigo; rm -rf emulador; mkdir emulador; svn co https://github.com/rathena/rathena/trunk emulador; echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"; rm -rf $banco*; cd /home/emulador/sql-files; cp item_cash_db.sql item_cash_db2.sql item_db.sql item_db2.sql item_db2_re.sql item_db_re.sql logs.sql main.sql mob_db.sql mob_db2.sql mob_db2_re.sql mob_db_re.sql mob_skill_db.sql mob_skill_db2.sql mob_skill_db2_re.sql mob_skill_db_re.sql roulette_default_data.sql $banco; sv preparar
+            cd /home; sv antigo; rm -rf emulador; mkdir emulador; svn co https://github.com/rathena/rathena/trunk emulador; echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"; rm -rf $BANCO*; cd /home/emulador/sql-files; cp item_cash_db.sql item_cash_db2.sql item_db.sql item_db2.sql item_db2_re.sql item_db_re.sql logs.sql main.sql mob_db.sql mob_db2.sql mob_db2_re.sql mob_db_re.sql mob_skill_db.sql mob_skill_db2.sql mob_skill_db2_re.sql mob_skill_db_re.sql roulette_default_data.sql $BANCO; sv preparar
             importarDB
         ;;
+
+        'importar-db')
+			importarDB
+		;;
+
+		'editar')
+
+			# Verifica o nome do emulador utilizado no momento, se é Hércules ou rAthena
+			NOME_EMULADOR=$(ls -l $EMULADOR | awk '{print $9}' | cut -d "-" -f1 | cut -d "." -f1 | uniq | grep -E "Hercules|rAthena" | head -n 1)
+
+			PS3="Selecione o que deseja editar em seu emulador: "
+			select menu_editar in "IP" "Nome" "Rates" "Level" "Drops" "Configuração Renovação" "Configuração Pré-Renovação" "Sair/Encerrar"
+			do
+				case "$menu_editar" in
+
+					'IP')
+
+						if [[ "$NOME_EMULADOR" = "Hercules" ]] || [[ "$NOME_EMULADOR" = "brAthena" ]]; then
+
+							# Descobrir o IP atual do Hércules
+							IP_ATUAL=$(cat $EMULADOR/conf/char/char-server.conf | grep "login_ip:" | cut -d "\"" -f2)
+
+							echo
+							read -p "O IP configurado atualmente é '$IP_ATUAL', deseja alterar? (S/N) " DESEJA_ALTERAR
+
+							if [[ "$DESEJA_ALTERAR" = "S" ]] || [[ "$DESEJA_ALTERAR" = "s" ]]; then
+								echo
+								read -p "Informe número do novo IP: " NOVO_IP
+								echo
+
+								sed -i 's/"'$IP_ATUAL'"/"'$NOVO_IP'"/' $EMULADOR/conf/char/char-server.conf
+								sed -i 's/"'$IP_ATUAL'"/"'$NOVO_IP'"/' $EMULADOR/conf/map/map-server.conf
+
+								if [[ "$?" = 0 ]]; then
+									echo
+									echo "IP alterado com sucesso!"
+									echo
+								else
+									echo
+									echo "Falha na troca do IP!"
+									echo
+								fi
+
+								# Verifica se "login_ip", "char_ip" e "map_ip" estão com comentário //, se estiver, remove
+
+								if [ "cat $EMULADOR/conf/char/char-server.conf | grep '//login_ip:' > /dev/null" ]; then
+									sed -i 's/\/\/login_ip:/login_ip:/' $EMULADOR/conf/char/char-server.conf
+								fi
+
+								if [ "cat $EMULADOR/conf/char/char-server.conf | grep '//char_ip:' > /dev/null" ]; then
+									sed -i 's/\/\/char_ip:/char_ip:/' $EMULADOR/conf/char/char-server.conf
+									sed -i 's/\/\/char_ip:/char_ip:/' $EMULADOR/conf/map/map-server.conf
+								fi
+
+								if [ "cat $EMULADOR/conf/char/map-server.conf | grep '//map_ip:' > /dev/null" ]; then
+									sed -i 's/\/\/map_ip:/map_ip:/' $EMULADOR/conf/map/map-server.conf
+								fi
+							else
+								exit 0
+							fi # Fim do segundo IF
+
+						elif [[ "$NOME_EMULADOR" = "rAthena" ]]; then
+
+							# Descobrir o IP atual do rAthena
+
+							IP_ATUAL=$(cat $EMULADOR/conf/char_athena.conf | grep "login_ip:" | cut -d " " -f2)
+							
+							echo
+							read -p "O IP configurado atualmente é '$IP_ATUAL', deseja alterar? (S/N) " DESEJA_ALTERAR
+
+							if [[ "$DESEJA_ALTERAR" = "S" ]] || [[ "$DESEJA_ALTERAR" = "s" ]]; then
+								echo
+								read -p "Informe número do novo IP: " NOVO_IP
+								echo
+
+								sed -i 's/'$IP_ATUAL'/'$NOVO_IP'/' $EMULADOR/conf/char_athena.conf
+								sed -i 's/'$IP_ATUAL'/'$NOVO_IP'/' $EMULADOR/conf/map_athena.conf
+
+								if [[ "$?" = 0 ]]; then
+									echo
+									echo "IP alterado com sucesso!"
+									echo
+								else
+									echo
+									echo "Falha na troca do IP!"
+									echo
+								fi
+
+								# Verifica se "login_ip", "char_ip" e "map_ip" estão com comentário //, se estiver, remove
+
+								if [ "cat $EMULADOR/conf/char_athena.conf | grep '//login_ip:' > /dev/null" ]; then
+									sed -i 's/\/\/login_ip:/login_ip:/' $EMULADOR/conf/char_athena.conf
+								fi
+
+								if [ "cat $EMULADOR/conf/char_athena.conf | grep '//char_ip:' > /dev/null" ]; then
+									sed -i 's/\/\/char_ip:/char_ip:/' $EMULADOR/conf/char_athena.conf
+									sed -i 's/\/\/char_ip:/char_ip:/' $EMULADOR/conf/map_athena.conf
+								fi
+
+								if [ "cat $EMULADOR/conf/map_athena.conf | grep '//map_ip:' > /dev/null" ]; then
+									sed -i 's/\/\/map_ip:/map_ip:/' $EMULADOR/conf/map_athena.conf
+								fi
+							else
+								exit 0
+							fi # Fim do IF "Deseja continuar" do emulador rAthena
+							
+						else
+							echo "Não é o Hércules, ajuste!"
+						fi # Fim do primeiro IF
+						
+					;;
+
+					'Nome')
+						echo "Função '"$menu_editar"' em construção!"
+					;;
+
+					'Rates')
+						echo "Função '"$menu_editar"' em construção!"
+					;;
+
+					'Level')
+						echo "Função '"$menu_editar"' em construção!"
+					;;
+
+					'Drops')
+						echo "Função '"$menu_editar"' em construção!"
+					;;
+
+					'Configuração Renovação')
+						echo "Função '"$menu_editar"' em construção!"
+					;;
+
+					'Configuração Pré-Renovação')
+						echo "Função '"$menu_editar"' em construção!"
+					;;
+
+					'Sair/Encerrar')
+						exit 0
+					;;
+				esac
+			done
+		;;
         
         *)
-            echo -e "\nOs comandos válidos são:\n\nsv ligar - Liga o emulador (brAthena/Cronus/Hércules/rAthena/eAmods)\nsv desligar - Desliga o emulador (brAthena/Cronus/Hércules/rAthena/eAmods)\nsv compilar - Compila o emulador (brAthena/Cronus/Hércules)\nsv status - Verifica se o emulador está com seus processos ligados ou desligados\nsv compilar-cmake - Compilar emulador com CMAKE (emuladores específicos)\nsv screen - Roda o emulador em segundo plano com o Screen\nsv retornar - Retorna à tela do Screen nos demais acessos ao SSH\nsv preparar - Dá as permissões iniciais ao emulador (chmod 777 configure e ./configure)\nsv backup - Cria um backup e um arquivo .zip da pasta /home/emulador em /home/backup\nsv baixar-emulador - Baixar emuladores diretamente dos repositórios oficiais do GitHub (brAthena/Cronus/Hércules/rAthena)\nsv compilar-rathena - Comando especialmente criado para compilar emuladores rAthena (GCC-C++ versão 5.X)\nsv compilar-eamod - Comando especialmente criado para compilar emuladores eAmod\n\nPara utilizar os comandos, basta digitar em qualquer tela do seu SSH.\n\nLembre-se de que seu emulador precisa ser instalado dentro de $emulador para o correto funcionamento dos comandos."
+            cat << EOF
+
+Os comandos válidos são:
+
+sv ligar - Liga o emulador (brAthena/Cronus/Hércules/rAthena/eAmods)
+sv desligar - Desliga o emulador (brAthena/Cronus/Hércules/rAthena/eAmods)
+sv compilar - Compila o emulador (brAthena/Cronus/Hércules)
+sv compilar-rathena - Comando especialmente criado para compilar emuladores rAthena (GCC-C++ versão 5.X)
+sv compilar-eamod - Comando especialmente criado para compilar emuladores eAmod
+sv editar - Realiza edição dos emuladores Hércules e rAthena como "nome, rates, drops, level, etc"
+sv status - Verifica se o emulador está com seus processos ligados ou desligados
+sv compilar-cmake - Compilar emulador com CMAKE (emuladores específicos)
+sv screen - Roda o emulador em segundo plano com o Screen
+sv retornar - Retorna à tela do Screen nos demais acessos ao SSH
+sv preparar - Dá as permissões iniciais ao emulador (chmod 777 configure e ./configure)
+sv backup - Cria um backup e um arquivo .zip da pasta /home/emulador em /home/backup
+sv baixar-emulador - Baixar emuladores diretamente dos repositórios oficiais do GitHub (brAthena/Cronus/Hércules/rAthena)
+
+Para utilizar os comandos, basta digitar em qualquer tela do seu SSH.
+
+Lembre-se de que seu emulador precisa ser instalado dentro de $EMULADOR para o correto funcionamento dos comandos.
+
+EOF
 esac 

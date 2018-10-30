@@ -4,7 +4,6 @@ The "SV" command for Ragnarok was created in 2016 or earlier by **Rhulio Victor*
 
 ## Technical information
 
-**Current Version:** [3.6](https://github.com/agenciah1code/ComandoSV-Ragnarok/tree/master)  
 **Operating Systems:** Linux  
 **Distributions:** Tested and created in CentOS 6.  
 

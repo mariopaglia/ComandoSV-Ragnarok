@@ -495,11 +495,7 @@ case $1 in
 	svn co https://github.com/HerculesWS/Hercules/trunk emulador
 	echo "O seu emulador foi baixado com sucesso e se encontra dentro de /home/emulador"
 	rm -rf $BANCO*
-	cd /home/emulador/sql
-	cp *.sql $BANCO
-	cd /home/emulador/sql/pre-renovacao
-	cp *.sql $BANCO
-	cd /home/emulador/sql/renovacao
+	cd /home/emulador/sql-files/
 	cp *.sql $BANCO
 	sv preparar
 	importarDB
@@ -670,7 +666,7 @@ sv desligar - Desliga o emulador (brAthena/Cronus/Hércules/rAthena/eAmods)
 sv compilar - Compila o emulador (brAthena/Cronus/Hércules)
 sv compilar-rathena - Comando especialmente criado para compilar emuladores rAthena (GCC-C++ versão 5.X)
 sv compilar-eamod - Comando especialmente criado para compilar emuladores eAmod
-sv editar - Realiza edição dos emuladores Hércules e rAthena como "nome, rates, drops, level, etc"
+sv editar - Realiza edição dos emuladores Hércules e rAthena como "nome, rates, drops, level, etc
 sv status - Verifica se o emulador está com seus processos ligados ou desligados
 sv compilar-cmake - Compilar emulador com CMAKE (emuladores específicos)
 sv screen - Roda o emulador em segundo plano com o Screen
@@ -678,6 +674,7 @@ sv retornar - Retorna à tela do Screen nos demais acessos ao SSH
 sv preparar - Dá as permissões iniciais ao emulador (chmod 777 configure e ./configure)
 sv backup - Cria um backup e um arquivo .zip da pasta /home/emulador em /home/backup
 sv baixar-emulador - Baixar emuladores diretamente dos repositórios oficiais do GitHub (brAthena/Cronus/Hércules/rAthena)
+sv importar-db - Importa automaticamente o banco de dados (necessário ter feito o sv baixar-emulador)
 
 Para utilizar os comandos, basta digitar em qualquer tela do seu SSH.
 
